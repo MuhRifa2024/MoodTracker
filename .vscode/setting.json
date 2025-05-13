@@ -1,0 +1,11 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/sqlite-jdbc-3.49.1.0.jar",
+        "lib/jfreechart-1.5.4.jar",
+        "lib/jbcrypt-0.4.jar",
+        "lib/jcommon-1.0.24.jar"
+    ],
+    "java.project.sourcePaths": ["src"],
+    "java.compiler.source": "24",
+    "java.compiler.target": "24"
+}
