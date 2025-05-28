@@ -30,15 +30,9 @@ public class AuthService {
     }
 
     public static boolean register(String username, String password) {
-        if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
-            throw new IllegalArgumentException("Username dan password tidak boleh kosong");
-        }
-
-        String sql = "INSERT INTO users(username, password) VALUES(?,?)";
-
+        String sql = "INSERT INTO users (username, password) VALUES (?, ?)";
         try (Connection conn = DatabaseHelper.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, username);
             pstmt.setString(2, hashPassword(password));
             pstmt.executeUpdate();

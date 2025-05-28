@@ -97,7 +97,7 @@ public class MoodPanel extends JPanel {
         catatan.setText("");
     }
 
-    private void refreshTable(DefaultTableModel model) {
+    public void refreshTable(DefaultTableModel model) {
         refreshTable(model, "Semua");
     }
 

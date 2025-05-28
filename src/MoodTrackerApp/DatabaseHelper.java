@@ -26,7 +26,7 @@ public class DatabaseHelper {
     }
 
     public static Connection getConnection() throws SQLException {
-        String url = "jdbc:sqlite:moodtracker.db"; // Path ke database SQLite
+        String url = "jdbc:sqlite:mood_tracker.db";
         return DriverManager.getConnection(url);
     }
 
