@@ -1,59 +1,91 @@
 import javax.swing.*;
 import java.awt.*;
-import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import javax.swing.table.DefaultTableModel;
 
 public class MoodPanel extends JPanel {
     private JTextArea catatan;
     private String currentUser;
 
     public MoodPanel(String currentUser) {
-        this.currentUser = currentUser; // Simpan username pengguna
+        this.currentUser = currentUser;
         setLayout(new BorderLayout());
 
-        // Tambahkan logo
+        // Custom background gradient
+        setOpaque(false);
+
+        // Panel atas: logo, judul, tanggal
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
+        topPanel.setOpaque(false);
+
+        // Logo kiri atas
+        JPanel logoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+        logoPanel.setOpaque(false);
         JLabel logoLabel = new JLabel();
-        logoLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        ImageIcon logoIcon = new ImageIcon("src/MoodTrackerApp/assets/logo.png"); // Path ke logo
-        if (logoIcon.getImageLoadStatus() != MediaTracker.COMPLETE) {
-            System.err.println("Logo tidak ditemukan di path: src/MoodTrackerApp/assets/logo.png");
-        }
-        Image logoImage = logoIcon.getImage().getScaledInstance(200, 100, Image.SCALE_SMOOTH);
+        ImageIcon logoIcon = new ImageIcon("src/MoodTrackerApp/assets/logo.png");
+        Image logoImage = logoIcon.getImage().getScaledInstance(250, 100, Image.SCALE_SMOOTH);
         logoLabel.setIcon(new ImageIcon(logoImage));
-        add(logoLabel, BorderLayout.NORTH);
+        logoPanel.add(logoLabel);
+        topPanel.add(logoPanel);
 
-        // Tambahkan tab untuk input mood dan riwayat mood
-        JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("Catat Mood", createInputPanel());
-        tabbedPane.addTab("Riwayat Mood", createHistoryPanel());
+        // Judul besar
+        JLabel titleLabel = new JLabel("Pencatat Mood Harian");
+        titleLabel.setFont(new Font("Comic Sans MS", Font.BOLD, 32));
+        titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        topPanel.add(titleLabel);
 
-        add(tabbedPane, BorderLayout.CENTER);
-    }
+        // Tanggal
+        JLabel dateLabel = new JLabel(new SimpleDateFormat("EEEE, d MMM yyyy").format(new Date()));
+        dateLabel.setFont(new Font("Arial", Font.PLAIN, 18));
+        dateLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        topPanel.add(dateLabel);
 
-    private JPanel createInputPanel() {
-        JPanel inputPanel = new JPanel();
-        inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.Y_AXIS));
+        add(topPanel, BorderLayout.NORTH);
 
-        JLabel moodLabel = new JLabel("Bagaimana perasaanmu hari ini?");
-        moodLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        moodLabel.setAlignmentX(CENTER_ALIGNMENT);
+        // Panel tengah: slider, input, tombol
+        JPanel centerPanel = new JPanel();
+        centerPanel.setOpaque(false);
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+        centerPanel.setBorder(BorderFactory.createEmptyBorder(40, 80, 40, 80));
 
+        // Slider mood
         JSlider moodSlider = new JSlider(0, 100, 50);
-        moodSlider.setPaintTicks(true);
-        moodSlider.setPaintLabels(false);
         moodSlider.setMajorTickSpacing(50);
         moodSlider.setMinorTickSpacing(10);
+        moodSlider.setPaintTicks(true);
+        moodSlider.setPaintLabels(false);
+        moodSlider.setMaximumSize(new Dimension(400, 40));
+        moodSlider.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        catatan = new JTextArea(); // Inisialisasi variabel catatan
+        // Label bawah slider
+        JPanel sliderLabelPanel = new JPanel(new BorderLayout());
+        sliderLabelPanel.setOpaque(false);
+        JLabel badLabel = new JLabel("Bad");
+        JLabel hmmLabel = new JLabel("Hmmmm", SwingConstants.CENTER);
+        JLabel goodLabel = new JLabel("Good", SwingConstants.RIGHT);
+        sliderLabelPanel.add(badLabel, BorderLayout.WEST);
+        sliderLabelPanel.add(hmmLabel, BorderLayout.CENTER);
+        sliderLabelPanel.add(goodLabel, BorderLayout.EAST);
+        sliderLabelPanel.setMaximumSize(new Dimension(400, 20));
+
+        // Input catatan
+        catatan = new JTextArea(2, 20);
+        catatan.setFont(new Font("Arial", Font.PLAIN, 16));
         catatan.setLineWrap(true);
         catatan.setWrapStyleWord(true);
-        catatan.setMaximumSize(new Dimension(400, 100));
-        catatan.setAlignmentX(CENTER_ALIGNMENT);
+        catatan.setMaximumSize(new Dimension(350, 40));
+        catatan.setAlignmentX(Component.CENTER_ALIGNMENT);
+        catatan.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        catatan.setText("Tulis Perasaanmu hari ini.....");
 
+        // Tombol simpan
         JButton saveButton = new JButton("Simpan");
-        saveButton.setAlignmentX(CENTER_ALIGNMENT);
+        saveButton.setFont(new Font("Arial", Font.BOLD, 16));
+        saveButton.setBackground(new Color(30, 60, 120));
+        saveButton.setForeground(Color.WHITE);
+        saveButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        saveButton.setMaximumSize(new Dimension(200, 40));
         saveButton.addActionListener(e -> {
             int moodValue = moodSlider.getValue();
             String note = catatan.getText();
@@ -61,83 +93,35 @@ public class MoodPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Mood: " + moodValue + "\nCatatan: " + note);
         });
 
-        inputPanel.add(Box.createVerticalStrut(20)); // Spasi
-        inputPanel.add(moodLabel);
-        inputPanel.add(Box.createVerticalStrut(10));
-        inputPanel.add(moodSlider);
-        inputPanel.add(Box.createVerticalStrut(10));
-        inputPanel.add(catatan);
-        inputPanel.add(Box.createVerticalStrut(10));
-        inputPanel.add(saveButton);
+        // Tambahkan komponen ke centerPanel
+        centerPanel.add(Box.createVerticalStrut(30));
+        centerPanel.add(moodSlider);
+        centerPanel.add(sliderLabelPanel);
+        centerPanel.add(Box.createVerticalStrut(30));
+        centerPanel.add(catatan);
+        centerPanel.add(Box.createVerticalStrut(30));
+        centerPanel.add(saveButton);
 
-        return inputPanel;
+        add(centerPanel, BorderLayout.CENTER);
     }
 
-    private JPanel createHistoryPanel() {
-        JPanel historyPanel = new JPanel(new BorderLayout());
-
-        JLabel historyLabel = new JLabel("Riwayat Mood");
-        historyLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        historyLabel.setHorizontalAlignment(SwingConstants.CENTER);
-
-        JTable historyTable = new JTable(); // Tabel untuk menampilkan riwayat mood
-        JScrollPane scrollPane = new JScrollPane(historyTable);
-
-        historyPanel.add(historyLabel, BorderLayout.NORTH);
-        historyPanel.add(scrollPane, BorderLayout.CENTER);
-
-        return historyPanel;
+    // Custom paintComponent untuk background gradient
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D) g;
+        int w = getWidth();
+        int h = getHeight();
+        Color color1 = new Color(120, 180, 255);
+        Color color2 = new Color(200, 220, 255);
+        GradientPaint gp = new GradientPaint(0, 0, color1, 0, h, color2);
+        g2d.setPaint(gp);
+        g2d.fillRect(0, 0, w, h);
     }
 
     private void saveMood(String mood) {
         String date = new SimpleDateFormat("dd-MM-yyyy HH:mm").format(new Date());
-        System.out.println("Menyimpan mood: " + mood + ", catatan: " + catatan.getText() + ", tanggal: " + date);
         DatabaseHelper.insertMood(currentUser, mood, catatan.getText(), date);
-        JOptionPane.showMessageDialog(this, "Mood disimpan: " + mood);
         catatan.setText("");
-    }
-
-    public void refreshTable(DefaultTableModel model) {
-        refreshTable(model, "Semua");
-    }
-
-    private void refreshTable(DefaultTableModel model, String filter) {
-        model.setRowCount(0); // Hapus data lama dari tabel
-        String sql = "SELECT date, mood, note FROM moods WHERE user = ?";
-
-        if (!filter.equals("Semua")) {
-            sql += " AND mood = ?";
-        }
-        sql += " ORDER BY date DESC";
-
-        System.out.println("Query SQL: " + sql);
-        System.out.println("Parameter user: " + currentUser);
-        if (!filter.equals("Semua")) {
-            System.out.println("Parameter filter: " + filter);
-        }
-
-        try (Connection conn = DatabaseHelper.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, currentUser);
-            if (!filter.equals("Semua")) {
-                stmt.setString(2, filter);
-            }
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                System.out.println("Data dari database:");
-                while (rs.next()) {
-                    System.out.println(
-                            rs.getString("date") + " - " + rs.getString("mood") + " - " + rs.getString("note"));
-                    model.addRow(new Object[] {
-                            rs.getString("date"),
-                            rs.getString("mood"),
-                            rs.getString("note")
-                    });
-                }
-            }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
-        }
     }
 }
